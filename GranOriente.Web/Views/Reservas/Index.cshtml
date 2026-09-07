@@ -1,0 +1,123 @@
+@model List<Reserva>
+
+@{
+    // El rol define qué botones estarán visibles.
+    var rol = (string?)ViewBag.Rol ?? "";
+}
+
+<h2>Reservas</h2>
+
+@* Solo ADMINISTRADOR y RECEPCIONISTA pueden crear nuevas reservas. *@
+@if (rol == "ADMINISTRADOR" ||
+     rol == "RECEPCIONISTA")
+{
+    <a class="btn"
+       asp-action="Crear">
+        + Nueva reserva
+    </a>
+}
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Huésped</th>
+            <th>Habitación</th>
+            <th>Ingreso</th>
+            <th>Salida</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @* Recorre todas las reservas recibidas desde el Controller. *@
+        @foreach (var x in Model)
+        {
+            <tr>
+
+                <td>@x.IdReserva</td>
+                <td>@x.Huesped</td>
+                <td>@x.NumeroHabitacion</td>
+
+                <td>
+                    @x.FechaIngreso.ToShortDateString()
+                </td>
+
+                <td>
+                    @x.FechaSalida.ToShortDateString()
+                </td>
+
+                <td>@x.Estado</td>
+
+                <td>Bs @x.PrecioReserva</td>
+
+                <td>
+
+                    @* =====================================================
+                       CHECK-IN
+                       Solo ADMINISTRADOR o RECEPCIONISTA.
+                       Solo aparece si la reserva está RESERVADA.
+                       ===================================================== *@
+                    @if ((rol == "ADMINISTRADOR" ||
+                          rol == "RECEPCIONISTA") &&
+                         x.Estado == "RESERVADA")
+                    {
+                        <form method="post"
+                              asp-action="CheckIn"
+                              class="form-inline">
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@x.IdReserva"/>
+
+                            <button type="submit">
+                                Check-in
+                            </button>
+
+                        </form>
+                    }
+
+
+                    @* =====================================================
+                       CONSUMOS Y CHECK-OUT
+                       Solo ADMINISTRADOR o CAJERO.
+                       Solo aparecen después del check-in.
+                       ===================================================== *@
+                    @if ((rol == "ADMINISTRADOR" ||
+                          rol == "CAJERO") &&
+                         x.Estado == "CHECKIN")
+                    {
+                        <a class="btn"
+                           asp-controller="Consumos"
+                           asp-action="Index"
+                           asp-route-idReserva="@x.IdReserva">
+                            Consumos
+                        </a>
+
+                        <a class="btn"
+                           asp-controller="Facturacion"
+                           asp-action="CheckOut"
+                           asp-route-idReserva="@x.IdReserva">
+                            Check-out
+                        </a>
+                    }
+
+
+                    @* Si la reserva ya terminó, se muestra una etiqueta. *@
+                    @if (x.Estado == "FINALIZADA")
+                    {
+                        <span class="estado-finalizado">
+                            Finalizada
+                        </span>
+                    }
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+</table>

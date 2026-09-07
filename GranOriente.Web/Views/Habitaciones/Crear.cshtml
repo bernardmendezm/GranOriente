@@ -1,0 +1,26 @@
+@* Formulario exclusivo del ADMINISTRADOR para registrar una habitación. *@
+
+@model Habitacion
+@{
+    var tipos = ViewBag.Tipos as List<TipoHabitacion>;
+    var estados = ViewBag.Estados as List<EstadoHabitacion>;
+}
+<h2>Nueva habitación</h2>
+@if (ViewBag.Error != null) { <div class="error">@ViewBag.Error</div> }
+<form method="post">
+    <label>Número de habitación</label>
+    <input asp-for="NumeroHabitacion" placeholder="Ej. 101" required />
+    <label>Tipo de habitación</label>
+    <select asp-for="IdTipoHabitacion">
+        @foreach (var tipo in tipos ?? new()) { <option value="@tipo.IdTipoHabitacion">@tipo.Tipo</option> }
+    </select>
+    <label>Estado</label>
+    <select asp-for="IdEstadoHabitacion">
+        @foreach (var estado in estados ?? new()) { <option value="@estado.IdEstadoHabitacion">@estado.Estado</option> }
+    </select>
+    <label>Capacidad</label><input asp-for="Capacidad" type="number" min="1" value="1" />
+    <label>Piso</label><input asp-for="Piso" type="number" min="1" value="1" />
+    <label>Descripción</label><textarea asp-for="Descripcion" placeholder="Descripción de la habitación"></textarea>
+    <button type="submit">Guardar habitación</button>
+    <a class="btn" asp-action="Index">Cancelar</a>
+</form>

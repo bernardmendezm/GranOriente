@@ -1,0 +1,218 @@
+@model Dashboard
+
+@{
+    // El controlador envía el rol mediante ViewBag.
+    var rol = (string?)ViewBag.Rol ?? "";
+}
+
+<h2>Panel principal</h2>
+
+<p>
+    Bienvenido
+    <strong>@ViewBag.Usuario</strong>
+    — Rol:
+    <strong>@ViewBag.Rol</strong>
+</p>
+
+
+@* =========================================================
+   PANEL DEL ADMINISTRADOR
+   Muestra indicadores y acceso completo al sistema.
+   ========================================================= *@
+@if (rol == "ADMINISTRADOR")
+{
+    <div class="dashboard">
+
+        @* Tarjeta 1: cantidad de habitaciones disponibles. *@
+        <a class="dashboard-card"
+           asp-controller="Habitaciones"
+           asp-action="Index">
+
+            <div class="dashboard-numero">
+                @Model.HabitacionesDisponibles
+            </div>
+
+            <div class="dashboard-titulo">
+                Habitaciones disponibles
+            </div>
+
+            <div class="dashboard-descripcion">
+                Ver habitaciones
+            </div>
+
+        </a>
+
+        @* Tarjeta 2: reservas activas. *@
+        <a class="dashboard-card"
+           asp-controller="Reservas"
+           asp-action="Index">
+
+            <div class="dashboard-numero">
+                @Model.ReservasActivas
+            </div>
+
+            <div class="dashboard-titulo">
+                Reservas activas
+            </div>
+
+            <div class="dashboard-descripcion">
+                Administrar reservas
+            </div>
+
+        </a>
+
+        @* Tarjeta 3: check-in realizados hoy. *@
+        <a class="dashboard-card"
+           asp-controller="Reservas"
+           asp-action="Index">
+
+            <div class="dashboard-numero">
+                @Model.CheckInHoy
+            </div>
+
+            <div class="dashboard-titulo">
+                Check-in de hoy
+            </div>
+
+            <div class="dashboard-descripcion">
+                Ver actividad
+            </div>
+
+        </a>
+
+        @* Tarjeta 4: facturas emitidas hoy. *@
+        <a class="dashboard-card"
+           asp-controller="Reportes"
+           asp-action="Ocupacion">
+
+            <div class="dashboard-numero">
+                @Model.FacturasHoy
+            </div>
+
+            <div class="dashboard-titulo">
+                Facturas de hoy
+            </div>
+
+            <div class="dashboard-descripcion">
+                Consultar actividad
+            </div>
+
+        </a>
+
+    </div>
+
+    <h3 class="titulo-accesos">
+        Accesos rápidos
+    </h3>
+
+    @* Botones rápidos para las funciones principales del administrador. *@
+    <div class="acciones-rapidas">
+
+        <a class="btn"
+           asp-controller="Reservas"
+           asp-action="Crear">
+            + Nueva reserva
+        </a>
+
+        <a class="btn"
+           asp-controller="Huespedes"
+           asp-action="Crear">
+            + Registrar huésped
+        </a>
+
+        <a class="btn"
+           asp-controller="Habitaciones"
+           asp-action="Crear">
+            + Nueva habitación
+        </a>
+
+        <a class="btn"
+           asp-controller="Usuarios"
+           asp-action="Index">
+            Gestionar usuarios
+        </a>
+
+        <a class="btn"
+           asp-controller="Reportes"
+           asp-action="Ocupacion">
+            Ver ocupación
+        </a>
+
+    </div>
+}
+
+
+@* =========================================================
+   PANEL DEL RECEPCIONISTA
+   Solo muestra las funciones permitidas para recepción.
+   ========================================================= *@
+@if (rol == "RECEPCIONISTA")
+{
+    <div class="panel-rol">
+
+        <h3>Funciones de recepción</h3>
+
+        <p>
+            Puede registrar huéspedes, consultar habitaciones,
+            crear reservas y realizar el check-in.
+        </p>
+
+        <div class="acciones-rapidas">
+
+            <a class="btn"
+               asp-controller="Huespedes"
+               asp-action="Index">
+                Huéspedes
+            </a>
+
+            <a class="btn"
+               asp-controller="Habitaciones"
+               asp-action="Index">
+                Ver habitaciones
+            </a>
+
+            <a class="btn"
+               asp-controller="Reservas"
+               asp-action="Crear">
+                + Nueva reserva
+            </a>
+
+            <a class="btn"
+               asp-controller="Reservas"
+               asp-action="Index">
+                Ver reservas
+            </a>
+
+        </div>
+
+    </div>
+}
+
+
+@* =========================================================
+   PANEL DEL CAJERO
+   Solo permite ir a Reservas para consumos y checkout.
+   ========================================================= *@
+@if (rol == "CAJERO")
+{
+    <div class="panel-rol">
+
+        <h3>Funciones de caja</h3>
+
+        <p>
+            Puede consultar las reservas con check-in,
+            registrar consumos y realizar el check-out/cobro.
+        </p>
+
+        <div class="acciones-rapidas">
+
+            <a class="btn"
+               asp-controller="Reservas"
+               asp-action="Index">
+                Ir a reservas
+            </a>
+
+        </div>
+
+    </div>
+}

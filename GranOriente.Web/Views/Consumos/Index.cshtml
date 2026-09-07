@@ -1,0 +1,22 @@
+@*
+    VISTA DE CONSUMOS
+    - Muestra consumos ya registrados.
+    - Permite seleccionar un servicio adicional.
+    - Envía idReserva, idServicio, cantidad y observaciones al Controller.
+*@
+
+@* Permite al CAJERO o ADMINISTRADOR agregar consumos a una reserva con check-in. *@
+
+@model List<Consumo>
+@{var servicios=ViewBag.Servicios as List<Servicio>; int id=(int)ViewBag.IdReserva;}
+<h2>Consumos de reserva #@id</h2>
+<form method="post" asp-action="Registrar">
+<input type="hidden" name="idReserva" value="@id"/>
+<label>Servicio</label><select name="idServicio">@foreach(var s in servicios??new()){<option value="@s.IdServicio">@s.NombreServicio - Bs @s.Precio</option>}</select>
+<label>Cantidad</label><input type="number" name="cantidad" min="1" value="1"/>
+<label>Observaciones</label><input name="observaciones"/>
+<button>Agregar consumo</button>
+</form>
+<table><thead><tr><th>Servicio</th><th>Cantidad</th><th>Precio</th><th>Fecha</th></tr></thead><tbody>
+@foreach(var c in Model){<tr><td>@c.Servicio</td><td>@c.Cantidad</td><td>@c.PrecioUnitario</td><td>@c.FechaHora</td></tr>}
+</tbody></table>

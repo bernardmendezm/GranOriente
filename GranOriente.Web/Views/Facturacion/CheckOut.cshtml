@@ -1,0 +1,343 @@
+@model ResumenCheckout
+
+@*
+    Esta vista se muestra antes de realizar el cobro.
+    Permite al cajero revisar toda la cuenta
+    antes de generar la factura definitiva.
+*@
+
+<h2>Check-out y facturación</h2>
+
+
+@*
+    Cabecera con datos generales de la reserva.
+*@
+<div class="factura-cabecera">
+
+    <div>
+
+        @* Id interno de la reserva. *@
+        <strong>Reserva:</strong>
+
+        #@Model.IdReserva
+
+    </div>
+
+
+    <div>
+
+        @* Nombre completo del huésped. *@
+        <strong>Huésped:</strong>
+
+        @Model.Huesped
+
+    </div>
+
+
+    <div>
+
+        @* Número y tipo de habitación. *@
+        <strong>Habitación:</strong>
+
+        @Model.NumeroHabitacion
+        -
+        @Model.TipoHabitacion
+
+    </div>
+
+
+    <div>
+
+        @* Fecha de ingreso formateada. *@
+        <strong>Ingreso:</strong>
+
+        @(Model.FechaIngreso.ToString("dd/MM/yyyy"))
+
+    </div>
+
+
+    <div>
+
+        @* Fecha de salida formateada. *@
+        <strong>Salida:</strong>
+
+        @(Model.FechaSalida.ToString("dd/MM/yyyy"))
+
+    </div>
+
+</div>
+
+
+<h3>Detalle de alojamiento</h3>
+
+
+@*
+    Tabla que resume el costo de la habitación.
+*@
+<table class="tabla-factura">
+
+    <thead>
+
+        <tr>
+
+            <th>Concepto</th>
+
+            <th>Cantidad</th>
+
+            <th>Precio unitario</th>
+
+            <th>Importe</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        <tr>
+
+            <td>
+
+                Habitación
+                @Model.NumeroHabitacion
+                (@Model.TipoHabitacion)
+
+            </td>
+
+
+            <td>
+
+                @Model.DiasEstadia
+                noche(s)
+
+            </td>
+
+
+            <td>
+
+                Bs
+                @(Model.PrecioNoche.ToString("N2"))
+
+            </td>
+
+
+            <td>
+
+                <strong>
+                    Bs
+                    @(Model.TotalAlojamiento.ToString("N2"))
+                </strong>
+
+            </td>
+
+        </tr>
+
+    </tbody>
+
+</table>
+
+
+<h3>Consumos registrados</h3>
+
+
+@*
+    Validamos si existen consumos.
+*@
+@if (Model.Consumos.Count == 0)
+{
+    <p class="texto-ayuda">
+        Esta reserva no tiene consumos adicionales.
+    </p>
+}
+else
+{
+    <table class="tabla-factura">
+
+        <thead>
+
+            <tr>
+
+                <th>Servicio</th>
+
+                <th>Cantidad</th>
+
+                <th>Precio unitario</th>
+
+                <th>Importe</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @*
+                Recorremos cada consumo registrado.
+            *@
+            @foreach (var consumo in Model.Consumos)
+            {
+                <tr>
+
+                    <td>
+
+                        @consumo.Servicio
+
+
+                        @*
+                            Si el consumo tiene observación,
+                            se muestra debajo del nombre.
+                        *@
+                        @if (!string.IsNullOrWhiteSpace(consumo.Observaciones))
+                        {
+                            <div class="detalle-secundario">
+                                @consumo.Observaciones
+                            </div>
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        @consumo.Cantidad
+
+                    </td>
+
+
+                    <td>
+
+                        Bs
+                        @(consumo.PrecioUnitario.ToString("N2"))
+
+                    </td>
+
+
+                    <td>
+
+                        Bs
+                        @(consumo.Importe.ToString("N2"))
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+}
+
+
+@*
+    Totales antes del cobro.
+*@
+<div class="totales-factura">
+
+    <div>
+
+        <span>Alojamiento:</span>
+
+        <strong>
+            Bs
+            @(Model.TotalAlojamiento.ToString("N2"))
+        </strong>
+
+    </div>
+
+
+    <div>
+
+        <span>Consumos:</span>
+
+        <strong>
+            Bs
+            @(Model.TotalConsumos.ToString("N2"))
+        </strong>
+
+    </div>
+
+
+    <div class="total-principal">
+
+        <span>Subtotal:</span>
+
+        <strong>
+            Bs
+            @(Model.Subtotal.ToString("N2"))
+        </strong>
+
+    </div>
+
+</div>
+
+
+@*
+    Este formulario procesa el cobro.
+    method="post" hace que se ejecute
+    FacturacionController.CheckOut(...) con [HttpPost].
+*@
+<form method="post"
+      class="form-pago">
+
+    @*
+        idReserva va oculto porque el cajero
+        no necesita modificarlo manualmente.
+    *@
+    <input type="hidden"
+           name="idReserva"
+           value="@Model.IdReserva"/>
+
+
+    <label>Método de pago</label>
+
+
+    @*
+        El valor seleccionado se enviará
+        en el parámetro metodoPago del Controller.
+    *@
+    <select name="metodoPago"
+            required>
+
+        <option value="EFECTIVO">
+            EFECTIVO
+        </option>
+
+        <option value="TARJETA">
+            TARJETA
+        </option>
+
+        <option value="QR">
+            QR
+        </option>
+
+    </select>
+
+
+    <label>Descuento (Bs)</label>
+
+
+    @*
+        step="0.01" permite ingresar centavos.
+        min="0" evita descuentos negativos.
+        max impide superar el subtotal.
+    *@
+    <input type="number"
+           step="0.01"
+           min="0"
+           max="@Model.Subtotal"
+           name="descuento"
+           value="0"/>
+
+
+    @*
+        Al presionar este botón:
+        1. se envía el formulario
+        2. se ejecuta el POST CheckOut
+        3. se genera la factura
+        4. se cierra la reserva
+    *@
+    <button type="submit">
+        Generar factura y cerrar reserva
+    </button>
+
+</form>

@@ -1,0 +1,129 @@
+@model Persona
+
+@*
+    Esta vista recibe un objeto Persona.
+    Los valores ingresados en los controles se asignarán
+    automáticamente a las propiedades de Persona.
+*@
+
+<h2>Registrar huésped</h2>
+
+@*
+    method="post" indica que al presionar Guardar,
+    los datos se enviarán mediante HTTP POST.
+    Como no especificamos asp-action, se enviarán a
+    HuespedesController -> Crear(Persona p).
+*@
+<form method="post">
+
+    <label>Nombre</label>
+
+    @*
+        asp-for="Nombre" conecta este input
+        con la propiedad Nombre del modelo Persona.
+    *@
+    <input asp-for="Nombre"
+           required />
+
+
+    <label>Apellido paterno</label>
+
+    <input asp-for="ApellidoPaterno" />
+
+
+    <label>Apellido materno</label>
+
+    <input asp-for="ApellidoMaterno" />
+
+
+    <label>Tipo de documento</label>
+
+    @*
+        El valor seleccionado se guardará
+        en Persona.TipoDocumento.
+    *@
+    <select asp-for="TipoDocumento">
+
+        <option value="CI">
+            CI
+        </option>
+
+        <option value="PASAPORTE">
+            Pasaporte
+        </option>
+
+        <option value="OTRO">
+            Otro
+        </option>
+
+    </select>
+
+
+    <label>Número de documento</label>
+
+    <input asp-for="NumeroDocumento"
+           required />
+
+
+    <label>Fecha de nacimiento</label>
+
+    @*
+        type="date" hace que el navegador
+        muestre un selector de fecha.
+    *@
+    <input asp-for="FechaNacimiento"
+           type="date" />
+
+
+    <label>Sexo</label>
+
+    <select asp-for="Sexo">
+
+        <option value="">
+            Seleccione
+        </option>
+
+        <option value="MASCULINO">
+            Masculino
+        </option>
+
+        <option value="FEMENINO">
+            Femenino
+        </option>
+
+        <option value="OTRO">
+            Otro
+        </option>
+
+    </select>
+
+
+    <label>Nacionalidad</label>
+
+    <input asp-for="Nacionalidad"
+           placeholder="Ej. Boliviana" />
+
+
+    <label>Teléfono</label>
+
+    <input asp-for="Telefono" />
+
+
+    <label>Email</label>
+
+    @*
+        type="email" permite que el navegador
+        valide el formato básico del correo.
+    *@
+    <input asp-for="Email"
+           type="email" />
+
+
+    @*
+        type="submit" envía todo el formulario al Controller.
+    *@
+    <button type="submit">
+        Guardar huésped
+    </button>
+
+</form>

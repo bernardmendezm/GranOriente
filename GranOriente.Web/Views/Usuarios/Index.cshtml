@@ -1,0 +1,61 @@
+@* Lista funcionarios y usuarios. Solo disponible para ADMINISTRADOR. *@
+
+@model List<FuncionarioUsuario>
+
+<h2>Usuarios y funcionarios</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="mensaje-exito">
+        @TempData["Mensaje"]
+    </div>
+}
+
+<div class="barra-acciones">
+    <a class="btn" asp-action="Crear">
+        + Nuevo funcionario
+    </a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Funcionario</th>
+            <th>Documento</th>
+            <th>Cargo</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var x in Model)
+        {
+            <tr>
+                <td>
+                    @x.Nombre
+                    @x.ApellidoPaterno
+                    @x.ApellidoMaterno
+                </td>
+
+                <td>
+                    @x.TipoDocumento -
+                    @x.NumeroDocumento
+                </td>
+
+                <td>@x.Cargo</td>
+
+                <td>@x.NombreUsuario</td>
+
+                <td>
+                    <span class="badge-rol">
+                        @x.Rol
+                    </span>
+                </td>
+
+                <td>@x.Estado</td>
+            </tr>
+        }
+    </tbody>
+</table>

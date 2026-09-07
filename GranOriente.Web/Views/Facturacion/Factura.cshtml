@@ -1,0 +1,474 @@
+@model FacturaDetalle
+
+@*
+    Esta vista recibe un objeto de tipo FacturaDetalle.
+    El Controller obtiene este objeto desde la capa de datos
+    y lo envía aquí después de generar el check-out.
+*@
+
+@*
+    factura-documento es un contenedor principal.
+    Sirve para agrupar visualmente toda la factura
+    y también facilita la impresión.
+*@
+<div class="factura-documento">
+
+    @*
+        Este bloque contiene:
+        - nombre del hotel
+        - tipo de comprobante
+        - número de factura
+        - fecha de emisión
+    *@
+    <div class="factura-titulo">
+
+        <div>
+
+            @* Nombre comercial del hotel. *@
+            <h2>
+                Hotel Gran Oriente
+            </h2>
+
+            @* Texto descriptivo del comprobante. *@
+            <p>
+                Factura / comprobante de estadía
+            </p>
+
+        </div>
+
+        @*
+            En este bloque mostramos el número de factura
+            y la fecha en la que fue emitida.
+        *@
+        <div class="factura-numero">
+
+            @*
+                NumeroFactura viene de la tabla FACTURA.
+            *@
+            <strong>
+                @Model.NumeroFactura
+            </strong>
+
+            @*
+                IMPORTANTE:
+                Se usa @(...) para que Razor interprete
+                toda la expresión completa como código C#.
+
+                Antes estaba separado en varias líneas
+                y Razor imprimía ".ToString(...)" como texto.
+            *@
+            <div>
+                @(Model.FechaEmision.ToString("dd/MM/yyyy HH:mm"))
+            </div>
+
+        </div>
+
+    </div>
+
+    @*
+        Línea divisoria visual.
+    *@
+    <hr/>
+
+
+    @*
+        factura-cabecera muestra información general:
+        reserva, huésped, documento, habitación,
+        ingreso, salida y método de pago.
+    *@
+    <div class="factura-cabecera">
+
+        <div>
+
+            @* Identificador interno de la reserva. *@
+            <strong>Reserva:</strong>
+
+            @* Se antepone # solo para mejorar la presentación. *@
+            #@Model.IdReserva
+
+        </div>
+
+
+        <div>
+
+            @* Nombre completo del huésped. *@
+            <strong>Huésped:</strong>
+
+            @Model.Huesped
+
+        </div>
+
+
+        <div>
+
+            @* Documento de identidad del huésped. *@
+            <strong>Documento:</strong>
+
+            @Model.DocumentoHuesped
+
+        </div>
+
+
+        <div>
+
+            @* Número y tipo de habitación asignada. *@
+            <strong>Habitación:</strong>
+
+            @Model.NumeroHabitacion
+            -
+            @Model.TipoHabitacion
+
+        </div>
+
+
+        <div>
+
+            @* Fecha de ingreso de la reserva. *@
+            <strong>Ingreso:</strong>
+
+            @*
+                ToString("dd/MM/yyyy") formatea la fecha
+                mostrando únicamente día, mes y año.
+            *@
+            @(Model.FechaIngreso.ToString("dd/MM/yyyy"))
+
+        </div>
+
+
+        <div>
+
+            @* Fecha de salida de la reserva. *@
+            <strong>Salida:</strong>
+
+            @(Model.FechaSalida.ToString("dd/MM/yyyy"))
+
+        </div>
+
+
+        <div>
+
+            @* Método utilizado para pagar la cuenta. *@
+            <strong>Método de pago:</strong>
+
+            @Model.MetodoPago
+
+        </div>
+
+    </div>
+
+
+    @*
+        Sección donde se muestra el costo del alojamiento.
+    *@
+    <h3>Detalle de alojamiento</h3>
+
+
+    @*
+        Esta tabla muestra una sola línea de alojamiento.
+        El concepto representa la habitación.
+        La cantidad representa las noches.
+        El precio unitario es el precio por noche.
+        El importe es el total de la estadía.
+    *@
+    <table class="tabla-factura">
+
+        <thead>
+
+            <tr>
+
+                @* Descripción del servicio cobrado. *@
+                <th>Concepto</th>
+
+                @* Número de noches cobradas. *@
+                <th>Cantidad</th>
+
+                @* Costo de una noche. *@
+                <th>Precio unitario</th>
+
+                @* Total del alojamiento. *@
+                <th>Importe</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr>
+
+                <td>
+
+                    @* Texto descriptivo de la habitación. *@
+                    Habitación
+                    @Model.NumeroHabitacion
+                    (@Model.TipoHabitacion)
+
+                </td>
+
+                <td>
+
+                    @* Cantidad de noches calculada desde ingreso y salida. *@
+                    @Model.DiasEstadia
+                    noche(s)
+
+                </td>
+
+                <td>
+
+                    @* Precio de una noche formateado con dos decimales. *@
+                    Bs
+                    @(Model.PrecioNoche.ToString("N2"))
+
+                </td>
+
+                <td>
+
+                    @* Total correspondiente solo al alojamiento. *@
+                    <strong>
+                        Bs
+                        @(Model.TotalAlojamiento.ToString("N2"))
+                    </strong>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+
+    @*
+        Sección donde mostramos los consumos adicionales.
+    *@
+    <h3>Consumos adicionales</h3>
+
+
+    @*
+        Si la lista de consumos está vacía,
+        mostramos un mensaje en lugar de una tabla sin datos.
+    *@
+    @if (Model.Consumos.Count == 0)
+    {
+        <p class="texto-ayuda">
+            No se registraron consumos adicionales.
+        </p>
+    }
+    else
+    {
+        @*
+            Si existen consumos,
+            mostramos una tabla con cada consumo por separado.
+        *@
+        <table class="tabla-factura">
+
+            <thead>
+
+                <tr>
+
+                    @* Nombre del servicio consumido. *@
+                    <th>Servicio</th>
+
+                    @* Cantidad solicitada. *@
+                    <th>Cantidad</th>
+
+                    @* Precio unitario del servicio. *@
+                    <th>Precio unitario</th>
+
+                    @* Cantidad x precio unitario. *@
+                    <th>Importe</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @*
+                    foreach recorre uno por uno
+                    los objetos almacenados en Model.Consumos.
+                *@
+                @foreach (var consumo in Model.Consumos)
+                {
+                    <tr>
+
+                        <td>
+
+                            @* Nombre del servicio. *@
+                            @consumo.Servicio
+
+
+                            @*
+                                Si existe una observación,
+                                se muestra debajo del servicio.
+                            *@
+                            @if (!string.IsNullOrWhiteSpace(consumo.Observaciones))
+                            {
+                                <div class="detalle-secundario">
+                                    @consumo.Observaciones
+                                </div>
+                            }
+
+
+                            @*
+                                Fecha y hora en la que se registró el consumo.
+                                Se usa @(...) para evitar problemas de Razor.
+                            *@
+                            <div class="detalle-secundario">
+                                @(consumo.FechaHora.ToString("dd/MM/yyyy HH:mm"))
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            @* Cantidad registrada del servicio. *@
+                            @consumo.Cantidad
+
+                        </td>
+
+
+                        <td>
+
+                            @* Precio por unidad del servicio. *@
+                            Bs
+                            @(consumo.PrecioUnitario.ToString("N2"))
+
+                        </td>
+
+
+                        <td>
+
+                            @* Total de esta línea de consumo. *@
+                            Bs
+                            @(consumo.Importe.ToString("N2"))
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+    }
+
+
+    @*
+        Bloque final de totales.
+        Aquí se resumen alojamiento, consumos,
+        subtotal, descuento y total final.
+    *@
+    <div class="totales-factura">
+
+        <div>
+
+            @* Total correspondiente únicamente a la habitación. *@
+            <span>
+                Total alojamiento:
+            </span>
+
+            <strong>
+                Bs
+                @(Model.TotalAlojamiento.ToString("N2"))
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            @* Suma de todos los consumos adicionales. *@
+            <span>
+                Total consumos:
+            </span>
+
+            <strong>
+                Bs
+                @(Model.TotalConsumos.ToString("N2"))
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            @* Subtotal antes de aplicar descuento. *@
+            <span>
+                Subtotal:
+            </span>
+
+            <strong>
+                Bs
+                @(Model.Subtotal.ToString("N2"))
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            @* Monto descontado durante el check-out. *@
+            <span>
+                Descuento:
+            </span>
+
+            <strong>
+                - Bs
+                @(Model.Descuento.ToString("N2"))
+            </strong>
+
+        </div>
+
+
+        @*
+            total-principal aplica un estilo más destacado
+            para resaltar el total final.
+        *@
+        <div class="total-principal">
+
+            <span>
+                TOTAL:
+            </span>
+
+            <strong>
+                Bs
+                @(Model.Total.ToString("N2"))
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    @*
+        Estos botones no se imprimen
+        gracias a la clase no-imprimir definida en CSS.
+    *@
+    <div class="factura-acciones no-imprimir">
+
+        @*
+            window.print() abre el cuadro de impresión
+            del navegador sin necesidad de código adicional.
+        *@
+        <button type="button"
+                onclick="window.print()">
+            Imprimir factura
+        </button>
+
+
+        @*
+            Este enlace regresa al listado de reservas.
+            asp-controller indica el Controller.
+            asp-action indica el método que se ejecutará.
+        *@
+        <a class="btn"
+           asp-controller="Reservas"
+           asp-action="Index">
+            Volver a reservas
+        </a>
+
+    </div>
+
+</div>

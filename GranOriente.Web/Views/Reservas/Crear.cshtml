@@ -1,0 +1,33 @@
+@*
+    VISTA DE CREACIÓN DE RESERVA
+    - Recibe los datos seleccionados por el usuario.
+    - Usa ViewBag.Huespedes para llenar el combo de huéspedes.
+    - Usa ViewBag.Habitaciones para mostrar solo habitaciones disponibles.
+    - Al enviar el formulario, ReservasController recibe un objeto Reserva.
+*@
+
+@* Formulario para buscar disponibilidad y registrar una nueva reserva. *@
+
+@model Reserva
+@{
+ var huespedes=ViewBag.Huespedes as List<Huesped>;
+ var habitaciones=ViewBag.Habitaciones as List<Habitacion>;
+}
+<h2>Nueva reserva</h2>
+@if(ViewBag.Error!=null){<div class="error">@ViewBag.Error</div>}
+<form method="get" asp-action="Crear">
+<label>Ingreso</label><input type="date" name="ingreso" value="@(((DateTime)ViewBag.Ingreso).ToString("yyyy-MM-dd"))"/>
+<label>Salida</label><input type="date" name="salida" value="@(((DateTime)ViewBag.Salida).ToString("yyyy-MM-dd"))"/>
+<button>Buscar disponibilidad</button>
+</form>
+<hr/>
+<form method="post">
+<input type="hidden" asp-for="FechaIngreso" value="@(((DateTime)ViewBag.Ingreso).ToString("yyyy-MM-dd"))"/>
+<input type="hidden" asp-for="FechaSalida" value="@(((DateTime)ViewBag.Salida).ToString("yyyy-MM-dd"))"/>
+<label>Huésped</label><select asp-for="IdHuesped">@foreach(var h in huespedes??new()){<option value="@h.IdHuesped">@h.Persona.Nombre @h.Persona.ApellidoPaterno</option>}</select>
+<label>Habitación disponible</label><select asp-for="IdHabitacion">@foreach(var h in habitaciones??new()){<option value="@h.IdHabitacion">@h.NumeroHabitacion - @h.TipoHabitacion</option>}</select>
+<label>Cantidad personas</label><input asp-for="CantidadPersona" type="number" min="1" value="1"/>
+<label>Tipo reserva</label><select asp-for="TipoReserva"><option>PRESENCIAL</option><option>ONLINE</option></select>
+<label>Observaciones</label><textarea asp-for="Observaciones"></textarea>
+<button>Registrar reserva</button>
+</form>

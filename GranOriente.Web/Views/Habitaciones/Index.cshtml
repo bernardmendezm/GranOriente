@@ -1,0 +1,74 @@
+@model List<Habitacion>
+
+@* 
+    @model indica qué tipo de información recibe esta vista.
+    En este caso recibe una lista de objetos Habitacion.
+*@
+
+<h2>Habitaciones</h2>
+
+@*
+    ViewBag.Rol fue cargado desde HabitacionesController.
+    Solo mostramos el botón Nueva habitación al ADMINISTRADOR.
+    El recepcionista puede consultar, pero no crear.
+*@
+@if ((string?)ViewBag.Rol == "ADMINISTRADOR")
+{
+    @*
+        asp-action="Crear" genera un enlace hacia
+        HabitacionesController -> Crear().
+    *@
+    <a class="btn"
+       asp-action="Crear">
+        + Nueva habitación
+    </a>
+}
+
+<table>
+
+    @* Encabezados de la tabla. *@
+    <thead>
+        <tr>
+            <th>Nro.</th>
+            <th>Tipo</th>
+            <th>Piso</th>
+            <th>Capacidad</th>
+            <th>Estado</th>
+            <th>Descripción</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @*
+            foreach recorre una por una las habitaciones
+            recibidas dentro de Model.
+        *@
+        @foreach (var x in Model)
+        {
+            <tr>
+
+                @* Muestra el número de habitación. *@
+                <td>@x.NumeroHabitacion</td>
+
+                @* Muestra el tipo obtenido mediante JOIN en SQL Server. *@
+                <td>@x.TipoHabitacion</td>
+
+                @* Piso donde se encuentra la habitación. *@
+                <td>@x.Piso</td>
+
+                @* Número máximo de huéspedes permitidos. *@
+                <td>@x.Capacidad</td>
+
+                @* Estado actual: DISPONIBLE, OCUPADA, etc. *@
+                <td>@x.EstadoHabitacion</td>
+
+                @* Descripción libre de la habitación. *@
+                <td>@x.Descripcion</td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>

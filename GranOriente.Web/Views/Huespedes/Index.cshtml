@@ -1,0 +1,23 @@
+@* Lista todos los huéspedes registrados. *@
+
+@model List<Huesped>
+<h2>Huéspedes</h2>
+<a class="btn" asp-action="Crear">+ Nuevo huésped</a>
+<table>
+<thead><tr>
+<th>Nombre</th><th>Documento</th><th>Fecha nacimiento</th><th>Sexo</th>
+<th>Nacionalidad</th><th>Teléfono</th><th>Email</th>
+</tr></thead>
+<tbody>
+@foreach (var x in Model)
+{
+<tr>
+<td>@x.Persona.Nombre @x.Persona.ApellidoPaterno @x.Persona.ApellidoMaterno</td>
+<td>@x.Persona.TipoDocumento - @x.Persona.NumeroDocumento</td>
+<td>@(x.Persona.FechaNacimiento?.ToString("dd/MM/yyyy"))</td>
+<td>@x.Persona.Sexo</td><td>@x.Persona.Nacionalidad</td>
+<td>@x.Persona.Telefono</td><td>@x.Persona.Email</td>
+</tr>
+}
+</tbody>
+</table>

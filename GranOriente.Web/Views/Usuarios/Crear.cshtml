@@ -1,0 +1,162 @@
+@*
+    VISTA DE CREACIÓN DE FUNCIONARIO/USUARIO
+    - Los primeros campos son los mismos datos personales usados para un huésped.
+    - Luego se agregan cargo, fecha de ingreso, usuario, contraseña y rol.
+    - El Controller guarda PERSONA -> EMPLEADOS -> USUARIO.
+*@
+
+@* Formulario para crear PERSONA + EMPLEADO + USUARIO en una sola operación. *@
+
+@model FuncionarioUsuario
+
+@{
+    var roles = ViewBag.Roles as List<RolSistema>;
+}
+
+<h2>Registrar funcionario y usuario</h2>
+
+<p class="texto-ayuda">
+    Los datos personales son los mismos utilizados para registrar un huésped.
+    Al guardar también se crearán el funcionario, su cuenta de usuario y su rol.
+</p>
+
+@if (ViewBag.Error != null)
+{
+    <div class="error">
+        @ViewBag.Error
+    </div>
+}
+
+<form method="post">
+
+    <h3>Datos personales</h3>
+
+    <div class="form-grid">
+
+        <div>
+            <label>Nombre</label>
+            <input asp-for="Nombre" required />
+        </div>
+
+        <div>
+            <label>Apellido paterno</label>
+            <input asp-for="ApellidoPaterno" />
+        </div>
+
+        <div>
+            <label>Apellido materno</label>
+            <input asp-for="ApellidoMaterno" />
+        </div>
+
+        <div>
+            <label>Tipo de documento</label>
+            <select asp-for="TipoDocumento">
+                <option value="CI">CI</option>
+                <option value="PASAPORTE">Pasaporte</option>
+                <option value="OTRO">Otro</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Número de documento</label>
+            <input asp-for="NumeroDocumento" required />
+        </div>
+
+        <div>
+            <label>Fecha de nacimiento</label>
+            <input asp-for="FechaNacimiento" type="date" />
+        </div>
+
+        <div>
+            <label>Sexo</label>
+            <select asp-for="Sexo">
+                <option value="">Seleccione</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="FEMENINO">Femenino</option>
+                <option value="OTRO">Otro</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Nacionalidad</label>
+            <input asp-for="Nacionalidad"
+                   placeholder="Ej. Boliviana" />
+        </div>
+
+        <div>
+            <label>Teléfono</label>
+            <input asp-for="Telefono" />
+        </div>
+
+        <div>
+            <label>Email</label>
+            <input asp-for="Email"
+                   type="email" />
+        </div>
+
+    </div>
+
+    <h3>Datos laborales y acceso</h3>
+
+    <div class="form-grid">
+
+        <div>
+            <label>Cargo</label>
+            <select asp-for="Cargo" required>
+                <option value="">Seleccione</option>
+                <option value="Recepcionista">Recepcionista</option>
+                <option value="Cajero">Cajero</option>
+                <option value="Administrador">Administrador</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Fecha de ingreso</label>
+            <input asp-for="FechaIngreso"
+                   type="date" />
+        </div>
+
+        <div>
+            <label>Nombre de usuario</label>
+            <input asp-for="NombreUsuario"
+                   autocomplete="off"
+                   required />
+        </div>
+
+        <div>
+            <label>Contraseña</label>
+            <input asp-for="Password"
+                   type="password"
+                   autocomplete="new-password"
+                   required />
+        </div>
+
+        <div>
+            <label>Rol</label>
+            <select asp-for="IdRol" required>
+                <option value="">Seleccione</option>
+
+                @foreach (var rol in roles ?? new())
+                {
+                    <option value="@rol.IdRol">
+                        @rol.Nombre
+                    </option>
+                }
+
+            </select>
+        </div>
+
+    </div>
+
+    <div class="acciones-formulario">
+        <button type="submit">
+            Guardar funcionario
+        </button>
+
+        <a class="btn"
+           asp-action="Index">
+            Cancelar
+        </a>
+    </div>
+
+</form>

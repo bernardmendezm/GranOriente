@@ -1,0 +1,97 @@
+@using Microsoft.AspNetCore.Http
+
+@{
+    // Recupera el rol desde la sesión.
+    // Con este dato se decide qué opciones del menú mostrar.
+    var rolActual = Context.Session.GetString("Rol");
+}
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1"/>
+
+    <title>Hotel Gran Oriente</title>
+
+    @* Carga la hoja de estilos principal. *@
+    <link rel="stylesheet"
+          href="~/css/site.css"/>
+</head>
+
+<body>
+
+<header>
+
+    @* Nombre del sistema. *@
+    <div class="brand">
+        Hotel Gran Oriente
+    </div>
+
+    <nav>
+
+        @* Todos los usuarios autenticados pueden volver al Inicio. *@
+        <a asp-controller="Home"
+           asp-action="Index">
+            Inicio
+        </a>
+
+        @* ADMINISTRADOR y RECEPCIONISTA pueden usar Huéspedes y Habitaciones. *@
+        @if (rolActual == "ADMINISTRADOR" ||
+             rolActual == "RECEPCIONISTA")
+        {
+            <a asp-controller="Huespedes"
+               asp-action="Index">
+                Huéspedes
+            </a>
+
+            <a asp-controller="Habitaciones"
+               asp-action="Index">
+                Habitaciones
+            </a>
+        }
+
+        @* Los tres roles pueden consultar Reservas. *@
+        @if (rolActual == "ADMINISTRADOR" ||
+             rolActual == "RECEPCIONISTA" ||
+             rolActual == "CAJERO")
+        {
+            <a asp-controller="Reservas"
+               asp-action="Index">
+                Reservas
+            </a>
+        }
+
+        @* Usuarios y Reportes quedan únicamente para el administrador. *@
+        @if (rolActual == "ADMINISTRADOR")
+        {
+            <a asp-controller="Usuarios"
+               asp-action="Index">
+                Usuarios
+            </a>
+
+            <a asp-controller="Reportes"
+               asp-action="Ocupacion">
+                Reportes
+            </a>
+        }
+
+        @* Cierra la sesión actual. *@
+        <a asp-controller="Account"
+           asp-action="Logout">
+            Salir
+        </a>
+
+    </nav>
+
+</header>
+
+@* RenderBody inserta aquí el contenido de cada vista. *@
+<main class="container">
+    @RenderBody()
+</main>
+
+</body>
+</html>

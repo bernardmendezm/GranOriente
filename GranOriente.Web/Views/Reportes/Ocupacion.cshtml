@@ -1,0 +1,9 @@
+@* Reporte de ocupación por fecha. *@
+
+@model List<ReporteOcupacion>
+<h2>Reporte de ocupación</h2>
+<form method="get"><label>Fecha</label><input type="date" name="fecha" value="@(((DateTime)ViewBag.Fecha).ToString("yyyy-MM-dd"))"/><button>Consultar</button></form>
+<table><thead><tr><th>Habitación</th><th>Tipo</th><th>Estado físico</th><th>Ocupación</th></tr></thead><tbody>
+@foreach(var x in Model){<tr><td>@x.NumeroHabitacion</td><td>@x.TipoHabitacion</td><td>@x.Estado</td><td>@(x.Ocupada==1?"OCUPADA":"LIBRE")</td></tr>}
+</tbody></table>
+<button onclick="window.print()">Imprimir</button>
